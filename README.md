@@ -1,4 +1,4 @@
-#CHATROOM
+CHATROOM
 
 A simple yet useful project made using spring boot and nextjs.
 
