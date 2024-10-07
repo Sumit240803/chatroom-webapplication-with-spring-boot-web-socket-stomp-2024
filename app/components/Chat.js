@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import { useState } from 'react'
-import { connectWebSocket , sendMessage } from '../utils/websocket'
+import { connectWebSocket , sendMessage, unSubscribe } from '../utils/websocket'
 const Chat = ({chatrooms,showChat}) => {
     const[messages , setMessages] = useState([]);
     const[messageContent , setMessageContent] = useState('');
@@ -11,8 +11,7 @@ const Chat = ({chatrooms,showChat}) => {
         id : ''
     });
     const[currName , setName] = useState('');
-    
-    
+    const[isSubscribed , setIsSubscribed]=useState(false);
   /*  useEffect(() => {
         let isSubscribed = true;
     
@@ -32,7 +31,6 @@ const Chat = ({chatrooms,showChat}) => {
         };
     }, []);*/
       // Empty array to ensure it runs only once
-      
     const handleSendMessage = (id)=>{
         const message = {
             sender : currName,
@@ -41,30 +39,38 @@ const Chat = ({chatrooms,showChat}) => {
         sendMessage(`${id}` ,message);
        // console.log(messages);
        // console.log(messageContent);
-        setMessageContent('');
+       setMessageContent('');
     }
+        
     const handleJoinChat = (id , name)=>{
+        if(!isSubscribed){
         setJoinChat(prevState => !prevState);
         setCurrChat({
             name : name,
             id : id
         });
-        let isSubscribed = true;
-    
+       // let isSubscribed = true;
         connectWebSocket((newMessage ) => {
             console.log("Raw message received from WebSocket:", newMessage); // Debugging the raw message
-    
-            if (isSubscribed) {
+            //if (isSubscribed) {
                 // Try parsing the message
                  // See what the parsed message looks like
-    
-                setMessages((prevMessages) => [...prevMessages, newMessage]);
-            }
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+            
+           // }
         },id);
-    
-        return () => {
+        setIsSubscribed(true);
+      }else{
+        alert("Bhai Band Karo");
+      }
+       /* return () => {
             isSubscribed = false;
-        };
+        };*/
+    }
+    const unsubscribe=()=>{
+      setJoinChat(prevState => !prevState);
+      setIsSubscribed(false);
+      unSubscribe();
     }
   return (
     <div className="flex h-full justify-between">
@@ -74,7 +80,7 @@ const Chat = ({chatrooms,showChat}) => {
       <>
         <div className="border-2 border-red-400 h-full flex flex-col justify-between">
             <h1 className="text-center font-bold text-xl my-2  ">
-             You're in {currChat.name}
+             You're in {currChat.name} <button onClick={()=>unsubscribe()}>Close</button>
             </h1>
           <div className="overflow-y-auto py-3  ">
             {messages.map((msg, index) => (
@@ -118,8 +124,8 @@ const Chat = ({chatrooms,showChat}) => {
     <div >
     {showChat &&
       chatrooms.map((chatroom) => (
-        <div className='border-2 border-black my-2 border-opacity-10 rounded-lg'>
-        <li key={chatroom.id} className="list-none text-xl p-2">
+        <div key={chatroom.id} className='border-2 border-black my-2 border-opacity-10 rounded-lg'>
+        <li  className="list-none text-xl p-2">
           {chatroom.name} -{' '}
           <button onClick={() => handleJoinChat(chatroom.id, chatroom.name)}>
             Join Chat

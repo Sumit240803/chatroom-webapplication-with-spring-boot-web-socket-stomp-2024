@@ -61,6 +61,7 @@ export default function Home() {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
             <h2 className="text-2xl font-bold mb-4 text-center">Enter Name</h2>
+            <button onClick={()=>setIsOpen(false)}>Close</button>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label

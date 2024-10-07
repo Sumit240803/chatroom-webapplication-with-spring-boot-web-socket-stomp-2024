@@ -1,7 +1,6 @@
 import { Client } from "@stomp/stompjs";
 
 let client;
-
 export const connectWebSocket = (onMessageReceived , id)=>{
     client = new Client({
         brokerURL: "ws://localhost:8080/ws",
@@ -35,5 +34,14 @@ export const sendMessage = (roomId , message)=>{
             destination:`/app/chat/${roomId}`,
             body : JSON.stringify(message)
         })
+    }
+}
+
+export const unSubscribe = ()=>{
+    if(client){
+        client.unsubscribe();
+        console.log("Unsubscribed");
+    }else{
+        console.log("No active subscription");
     }
 }
